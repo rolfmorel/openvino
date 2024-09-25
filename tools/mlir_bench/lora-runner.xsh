@@ -2,7 +2,7 @@
 
 # xonsh can be installed with `pip install xonsh`
 # xonsh can then be run by invoking `python -m xonsh`
-# this script in particular can be invoked with `python -m xonsh lora-benchmark.xsh`
+# this script in particular can be invoked with `python -m xonsh lora-runner.xsh`
 
 import openvino as ov
 from openvino.runtime.op import Constant
@@ -13,7 +13,7 @@ import re
 from os import environ
 
 
-LORA_DIMS = [2, 4, 8]
+LORA_DIMS = [8, 16, 32, 64, 128]
 CONFIGS = [
   [8], [16], [32], [64], [128], [256], [512], [1024],
   [2048], [4096], [8192]
@@ -112,7 +112,7 @@ def full_run(lora_dim):
         no_ov_averages.append(run_no_ov_mlir("OV_MLIR=1 OV_MLIR_TPP=1 OV_MLIR_DEBUG=1"))
 
         def run_manual_mlir(env_str):
-            mlir_model = build_mlir_lora_model(*config)
+            mlir_model = build_mlir_lora_model(*config, lora_dim=lora_dim)
             if DEBUG:
               print(mlir_model)
             raw_kernel_secs = $(@(lambda: print(mlir_model)) | tpp-run @(RUNNER_FLAGS) --lower-pack-unpack-without-transpose)
